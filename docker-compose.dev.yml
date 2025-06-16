@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: notification-db-dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notifications
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - notification-network-dev
+
+  redis:
+    image: redis:7-alpine
+    container_name: notification-redis-dev
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data_dev:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - notification-network-dev
+
+  # Optional: Use SQLite instead for lightweight development
+  # Just set DATABASE_TYPE=sqlite and DATABASE_URL=sqlite://./data/notifications.db
+
+volumes:
+  postgres_data_dev:
+  redis_data_dev:
+
+networks:
+  notification-network-dev:
+    driver: bridge

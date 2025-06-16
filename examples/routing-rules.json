@@ -1,0 +1,195 @@
+[
+  {
+    "name": "Critical Production Alerts",
+    "enabled": true,
+    "priority": 100,
+    "conditions": {
+      "source": ["monitoring", "alertmanager"],
+      "priority": "high",
+      "keywords": ["critical", "down", "error", "failed"],
+      "fields": {
+        "environment": "production",
+        "severity": { "$gte": 4 }
+      }
+    },
+    "channels": [
+      {
+        "type": "slack",
+        "name": "critical-alerts",
+        "config": {
+          "channel": "#incidents",
+          "method": "api"
+        },
+        "template": "critical-alert-template"
+      },
+      {
+        "type": "sms",
+        "name": "oncall-sms",
+        "config": {
+          "to": "+1234567890"
+        },
+        "delay": 300000,
+        "retryPolicy": {
+          "maxAttempts": 5,
+          "backoffMultiplier": 2,
+          "initialDelay": 5000,
+          "maxDelay": 60000
+        }
+      },
+      {
+        "type": "email",
+        "name": "incident-email",
+        "config": {
+          "to": "incidents@company.com",
+          "from": "alerts@company.com",
+          "subject": "CRITICAL: {{title}}"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Business Hours Notifications",
+    "enabled": true,
+    "priority": 50,
+    "conditions": {
+      "timeWindow": {
+        "start": "09:00",
+        "end": "17:00",
+        "timezone": "America/New_York",
+        "days": [1, 2, 3, 4, 5]
+      },
+      "priority": "medium"
+    },
+    "channels": [
+      {
+        "type": "slack",
+        "name": "team-notifications",
+        "config": {
+          "channel": "#team-updates",
+          "method": "webhook",
+          "webhookUrl": "https://hooks.slack.com/services/xxx/yyy/zzz"
+        }
+      }
+    ]
+  },
+  {
+    "name": "New User Signups",
+    "enabled": true,
+    "priority": 30,
+    "conditions": {
+      "source": "myapp",
+      "fields": {
+        "event": "user.signup"
+      }
+    },
+    "channels": [
+      {
+        "type": "email",
+        "name": "welcome-email",
+        "config": {
+          "to": "{{data.email}}",
+          "from": "welcome@company.com",
+          "subject": "Welcome to Our Service!",
+          "provider": "sendgrid"
+        },
+        "template": "welcome-email-template"
+      },
+      {
+        "type": "slack",
+        "name": "sales-notification",
+        "config": {
+          "channel": "#new-signups"
+        }
+      }
+    ],
+    "transform": {
+      "template": "{\n  \"title\": \"New {{data.plan}} signup!\",\n  \"body\": \"User {{data.email}} just signed up for the {{data.plan}} plan.\",\n  \"data\": {{json data}}\n}",
+      "engine": "handlebars"
+    }
+  },
+  {
+    "name": "Payment Notifications",
+    "enabled": true,
+    "priority": 40,
+    "conditions": {
+      "source": "stripe",
+      "fields": {
+        "type": { "$in": ["payment_intent.succeeded", "payment_intent.failed"] }
+      }
+    },
+    "channels": [
+      {
+        "type": "webhook",
+        "name": "accounting-webhook",
+        "config": {
+          "url": "https://accounting.company.com/webhook",
+          "headers": {
+            "X-Source": "notification-router"
+          },
+          "auth": {
+            "type": "bearer",
+            "token": "accounting-api-token"
+          }
+        }
+      },
+      {
+        "type": "email",
+        "name": "payment-email",
+        "config": {
+          "to": "finance@company.com",
+          "from": "payments@company.com",
+          "subject": "Payment {{data.object.status}}: ${{data.object.amount}}"
+        }
+      }
+    ]
+  },
+  {
+    "name": "GitHub PR Notifications",
+    "enabled": true,
+    "priority": 20,
+    "conditions": {
+      "source": "github",
+      "fields": {
+        "action": { "$in": ["opened", "closed", "merged"] }
+      }
+    },
+    "channels": [
+      {
+        "type": "discord",
+        "name": "dev-discord",
+        "config": {
+          "webhookUrl": "https://discord.com/api/webhooks/xxx/yyy"
+        }
+      }
+    ],
+    "transform": {
+      "template": "{\n  \"title\": \"PR {{action}}: {{pull_request.title}}\",\n  \"body\": \"{{pull_request.user.login}} {{action}} PR #{{pull_request.number}} in {{repository.name}}\",\n  \"data\": {\n    \"url\": \"{{pull_request.html_url}}\",\n    \"repository\": \"{{repository.name}}\",\n    \"action\": \"{{action}}\"\n  },\n  \"actions\": [\n    {\n      \"type\": \"button\",\n      \"text\": \"View PR\",\n      \"url\": \"{{pull_request.html_url}}\"\n    }\n  ]\n}",
+      "engine": "handlebars"
+    }
+  },
+  {
+    "name": "After Hours Emergency",
+    "enabled": true,
+    "priority": 90,
+    "conditions": {
+      "custom": "payload.priority === 'critical' && (new Date().getHours() < 9 || new Date().getHours() > 17)",
+      "keywords": ["emergency", "urgent", "critical"]
+    },
+    "channels": [
+      {
+        "type": "telegram",
+        "name": "emergency-telegram",
+        "config": {
+          "chatId": "-1001234567890"
+        }
+      },
+      {
+        "type": "sms",
+        "name": "emergency-sms",
+        "config": {
+          "to": ["+1234567890", "+0987654321"]
+        }
+      }
+    ]
+  }
+]
