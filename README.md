@@ -1,21 +1,21 @@
-# Notification Router
+# 🚀 Notification Router
 
-Open source notification router system that receives webhooks and intelligently routes notifications to multiple channels (Email, SMS, Slack, Telegram, Discord, etc.) with advanced transformation and routing rules.
+🔔 Open source notification router system that receives webhooks and intelligently routes notifications to multiple channels (Email, SMS, Slack, Telegram, Discord, etc.) with advanced transformation and routing rules.
 
-## Features
+## ✨ Features
 
-- **Multi-Channel Support**: Email, SMS, Slack, Telegram, Discord, Microsoft Teams, and custom webhooks
-- **Smart Routing**: Conditional routing based on content, priority, time windows, and custom rules
-- **Message Transformation**: Template engine with Handlebars support for dynamic content
-- **High Performance**: Redis-backed queue with priority processing and concurrent workers
-- **Reliability**: Retry mechanisms with exponential backoff and circuit breakers
-- **Security**: API key authentication, webhook signatures, and JWT support
-- **Monitoring**: Prometheus metrics, health checks, and comprehensive logging
-- **Easy Deployment**: Docker and docker-compose support for quick setup
+- 📱 **Multi-Channel Support**: Email, SMS, Slack, Telegram, Discord, Microsoft Teams, and custom webhooks
+- 🧠 **Smart Routing**: Conditional routing based on content, priority, time windows, and custom rules
+- 🔄 **Message Transformation**: Template engine with Handlebars support for dynamic content
+- ⚡ **High Performance**: Redis-backed queue with priority processing and concurrent workers
+- 🛡️ **Reliability**: Retry mechanisms with exponential backoff and circuit breakers
+- 🔐 **Security**: API key authentication, webhook signatures, and JWT support
+- 📊 **Monitoring**: Prometheus metrics, health checks, and comprehensive logging
+- 🐳 **Easy Deployment**: Docker and docker-compose support for quick setup
 
-## Quick Start
+## 🚀 Quick Start
 
-### Using Docker Compose (Recommended)
+### 🐳 Using Docker Compose (Recommended)
 
 1. Clone the repository:
 ```bash
@@ -40,7 +40,7 @@ The application will be available at:
 - API Documentation: http://localhost:3000/api-docs
 - Metrics: http://localhost:9090/metrics
 
-### Development Setup
+### 🔧 Development Setup
 
 1. Install dependencies:
 ```bash
@@ -57,9 +57,9 @@ docker-compose -f docker-compose.dev.yml up -d
 npm run dev
 ```
 
-## Configuration
+## ⚙️ Configuration
 
-### Environment Variables
+### 🔑 Environment Variables
 
 Key configuration options:
 
@@ -98,9 +98,9 @@ SLACK_SIGNING_SECRET=your-signing-secret
 # ... and more
 ```
 
-## Usage
+## 📖 Usage
 
-### 1. Receiving Webhooks
+### 1️⃣ Receiving Webhooks
 
 Send webhooks to the router:
 
@@ -116,7 +116,7 @@ curl -X POST http://localhost:3000/api/v1/webhooks/my-channel \
   }'
 ```
 
-### 2. Creating Routing Rules
+### 2️⃣ Creating Routing Rules
 
 ```bash
 curl -X POST http://localhost:3000/api/v1/rules \
@@ -151,7 +151,7 @@ curl -X POST http://localhost:3000/api/v1/rules \
   }'
 ```
 
-### 3. Message Templates
+### 3️⃣ Message Templates
 
 Create dynamic templates using Handlebars:
 
@@ -164,9 +164,9 @@ Create dynamic templates using Handlebars:
 }
 ```
 
-## Channel Configuration
+## 📡 Channel Configuration
 
-### Email
+### 📧 Email
 ```json
 {
   "type": "email",
@@ -179,7 +179,7 @@ Create dynamic templates using Handlebars:
 }
 ```
 
-### Slack
+### 💬 Slack
 ```json
 {
   "type": "slack",
@@ -191,7 +191,7 @@ Create dynamic templates using Handlebars:
 }
 ```
 
-### SMS (Twilio)
+### 📱 SMS (Twilio)
 ```json
 {
   "type": "sms",
@@ -202,7 +202,7 @@ Create dynamic templates using Handlebars:
 }
 ```
 
-### Custom Webhook
+### 🔗 Custom Webhook
 ```json
 {
   "type": "webhook",
@@ -220,11 +220,11 @@ Create dynamic templates using Handlebars:
 }
 ```
 
-## API Documentation
+## 📚 API Documentation
 
 Full API documentation is available at http://localhost:3000/api-docs when the server is running.
 
-### Key Endpoints
+### 🔑 Key Endpoints
 
 - `POST /api/v1/webhooks/:channel_id` - Receive webhooks
 - `GET /api/v1/rules` - List routing rules
@@ -235,14 +235,14 @@ Full API documentation is available at http://localhost:3000/api-docs when the s
 - `POST /api/v1/channels/test` - Test channel configuration
 - `GET /api/v1/notifications/queue/status` - Get queue status
 
-## Monitoring
+## 📊 Monitoring
 
-### Health Check
+### 🏥 Health Check
 ```bash
 curl http://localhost:3000/health
 ```
 
-### Prometheus Metrics
+### 📈 Prometheus Metrics
 Available at http://localhost:9090/metrics
 
 Key metrics:
@@ -252,9 +252,9 @@ Key metrics:
 - `queue_size` - Current queue size by status
 - `channel_errors_total` - Channel delivery errors
 
-## Advanced Features
+## 🎯 Advanced Features
 
-### Conditional Routing
+### 🔀 Conditional Routing
 
 ```javascript
 {
@@ -276,7 +276,7 @@ Key metrics:
 }
 ```
 
-### Retry Configuration
+### 🔄 Retry Configuration
 
 ```javascript
 {
@@ -289,27 +289,27 @@ Key metrics:
 }
 ```
 
-## Development
+## 🛠️ Development
 
-### Running Tests
+### 🧪 Running Tests
 ```bash
 npm test
 npm run test:watch
 ```
 
-### Linting
+### 🔍 Linting
 ```bash
 npm run lint
 ```
 
-### Building
+### 📦 Building
 ```bash
 npm run build
 ```
 
-## Deployment
+## 🚀 Deployment
 
-### Kubernetes
+### ☸️ Kubernetes
 
 Helm charts are available in the `/k8s` directory:
 
@@ -317,11 +317,11 @@ Helm charts are available in the `/k8s` directory:
 helm install notification-router ./k8s/helm
 ```
 
-### AWS Lambda
+### ⚡ AWS Lambda
 
 For serverless deployment, see the `/serverless` directory.
 
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -329,10 +329,10 @@ For serverless deployment, see the `/serverless` directory.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Support
+## 💬 Support
 
 - Issues: [GitHub Issues](https://github.com/ersinkoc/notification-router/issues)
