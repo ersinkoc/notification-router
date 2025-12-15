@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto'; // BUG-010 FIX: Import crypto at top instead of using require()
 import { AppError } from './errorHandler';
 import { config } from '../config';
 
@@ -44,7 +45,7 @@ export const verifyWebhookSignature = (secret: string) => {
 
       // TODO: Implement signature verification based on provider
       // For now, basic HMAC verification
-      const expectedSignature = require('crypto')
+      const expectedSignature = crypto
         .createHmac('sha256', secret)
         .update(JSON.stringify(req.body))
         .digest('hex');
@@ -89,11 +90,16 @@ export const authenticateJWT = (
   }
 };
 
+// BUG-007 FIX: Add try-catch to properly handle errors in async middleware
 export const requireRole = (roles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (!req.user || !roles.includes(req.user.role)) {
-      throw new AppError('Insufficient permissions', 403);
+    try {
+      if (!req.user || !roles.includes(req.user.role)) {
+        throw new AppError('Insufficient permissions', 403);
+      }
+      next();
+    } catch (error) {
+      next(error);
     }
-    next();
   };
 };

@@ -111,25 +111,41 @@ export class EmailAdapter implements ChannelAdapter {
     };
   }
 
+  // BUG-003 FIX: HTML escape function to prevent XSS
+  private escapeHtml(unsafe: string): string {
+    return unsafe
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   private formatHtml(message: MessageContent): string {
     let html = `<div style="font-family: Arial, sans-serif;">`;
-    
+
     if (message.title) {
-      html += `<h2>${message.title}</h2>`;
+      // Escape title to prevent XSS
+      html += `<h2>${this.escapeHtml(message.title)}</h2>`;
     }
-    
-    html += `<div>${message.body.replace(/\n/g, '<br>')}</div>`;
-    
+
+    // Escape body content and convert newlines to <br>
+    const escapedBody = this.escapeHtml(message.body).replace(/\n/g, '<br>');
+    html += `<div>${escapedBody}</div>`;
+
     if (message.actions && message.actions.length > 0) {
       html += `<div style="margin-top: 20px;">`;
       message.actions.forEach(action => {
         if (action.type === 'button' && action.url) {
-          html += `<a href="${action.url}" style="display: inline-block; padding: 10px 20px; margin: 5px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">${action.text}</a>`;
+          // Escape both URL and text to prevent XSS
+          const escapedUrl = this.escapeHtml(action.url);
+          const escapedText = this.escapeHtml(action.text);
+          html += `<a href="${escapedUrl}" style="display: inline-block; padding: 10px 20px; margin: 5px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">${escapedText}</a>`;
         }
       });
       html += `</div>`;
     }
-    
+
     html += `</div>`;
     return html;
   }

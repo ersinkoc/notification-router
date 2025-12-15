@@ -7,9 +7,21 @@ let sequelize: Sequelize;
 export async function initializeDatabase() {
   try {
     if (config.database.type === 'sqlite') {
+      // BUG-012 FIX: Properly parse SQLite URL to extract file path
+      // Supports both sqlite:///path/to/db.sqlite and sqlite://./relative/path
+      let storagePath = config.database.url;
+
+      if (storagePath.startsWith('sqlite:///')) {
+        // Absolute path: sqlite:///absolute/path/db.sqlite -> /absolute/path/db.sqlite
+        storagePath = storagePath.replace('sqlite://', '');
+      } else if (storagePath.startsWith('sqlite://')) {
+        // Relative path: sqlite://./relative/path -> ./relative/path
+        storagePath = storagePath.replace('sqlite://', '');
+      }
+
       sequelize = new Sequelize({
         dialect: 'sqlite',
-        storage: config.database.url.replace('sqlite://', ''),
+        storage: storagePath,
         logging: config.server.env === 'development' ? console.log : false,
       });
     } else {
