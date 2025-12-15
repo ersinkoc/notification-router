@@ -24,17 +24,11 @@ export async function transformMessage(
   rule: TransformRule,
 ): Promise<MessageContent> {
   try {
-    // Register custom helpers if provided
+    // BUG-002 FIX: Custom helpers disabled for security
+    // Custom helpers posed a critical security vulnerability allowing arbitrary code execution
+    // via Function constructor. Use built-in helpers instead: json, uppercase, lowercase, truncate, formatDate
     if (rule.helpers) {
-      Object.entries(rule.helpers).forEach(([name, func]) => {
-        try {
-          // Safely create helper function
-          const helperFunc = new Function('return ' + func)();
-          Handlebars.registerHelper(name, helperFunc);
-        } catch (error) {
-          logger.error(`Failed to register helper ${name}:`, error);
-        }
-      });
+      logger.warn('Custom Handlebars helpers are not supported for security reasons. Use built-in helpers: json, uppercase, lowercase, truncate, formatDate');
     }
 
     // Parse template

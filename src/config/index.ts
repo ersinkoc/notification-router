@@ -4,17 +4,20 @@ const envSchema = Joi.object({
   NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
   PORT: Joi.number().default(3000),
   HOST: Joi.string().default('0.0.0.0'),
-  
+
+  // BUG-011 FIX: Add CORS_ORIGINS environment variable
+  CORS_ORIGINS: Joi.string().optional(),
+
   DATABASE_TYPE: Joi.string().valid('sqlite', 'postgres').default('sqlite'),
   DATABASE_URL: Joi.string().required(),
-  
+
   REDIS_URL: Joi.string().default('redis://localhost:6379'),
   REDIS_PASSWORD: Joi.string().allow('').default(''),
-  
+
   JWT_SECRET: Joi.string().required(),
   API_KEY_SALT: Joi.string().required(),
   WEBHOOK_SECRET: Joi.string().required(),
-  
+
   RATE_LIMIT_WINDOW_MS: Joi.number().default(60000),
   RATE_LIMIT_MAX_REQUESTS: Joi.number().default(100),
   
@@ -54,14 +57,23 @@ if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }
 
+// BUG-011 FIX: Parse CORS origins from environment variable or use defaults
+const getCorsOrigins = (): string[] => {
+  if (envVars.CORS_ORIGINS) {
+    return envVars.CORS_ORIGINS.split(',').map((origin: string) => origin.trim());
+  }
+  // Default origins based on environment
+  return envVars.NODE_ENV === 'production'
+    ? ['https://yourdomain.com']
+    : ['http://localhost:3001', 'http://localhost:5173'];
+};
+
 export const config = {
   server: {
     env: envVars.NODE_ENV,
     port: envVars.PORT,
     host: envVars.HOST,
-    corsOrigins: envVars.NODE_ENV === 'production' 
-      ? ['https://yourdomain.com'] 
-      : ['http://localhost:3001', 'http://localhost:5173'],
+    corsOrigins: getCorsOrigins(),
   },
   
   database: {

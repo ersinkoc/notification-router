@@ -8,10 +8,23 @@ let notificationQueue: Bull.Queue<NotificationMessage>;
 
 export async function initializeQueue() {
   try {
+    // BUG-009 FIX: Add proper error handling for Redis URL parsing
+    let redisHost: string;
+    let redisPort: number;
+
+    try {
+      const redisUrl = new URL(config.redis.url);
+      redisHost = redisUrl.hostname;
+      redisPort = redisUrl.port ? parseInt(redisUrl.port) : 6379;
+    } catch (urlError) {
+      logger.error('Invalid Redis URL format:', config.redis.url);
+      throw new Error(`Invalid Redis URL: ${config.redis.url}. Expected format: redis://hostname:port`);
+    }
+
     notificationQueue = new Bull('notifications', {
       redis: {
-        host: new URL(config.redis.url).hostname,
-        port: parseInt(new URL(config.redis.url).port),
+        host: redisHost,
+        port: redisPort,
         password: config.redis.password || undefined,
       },
       defaultJobOptions: {
